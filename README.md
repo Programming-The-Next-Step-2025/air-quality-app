@@ -1,4 +1,4 @@
-# airqualityapp
+# airquality-app
 
 A Shiny-based R application for visualizing PM2.5 air quality data across cities. This interactive app allows users to view PM2.5 concentration trends over time and explore measurement stations on an interactive map.
 
