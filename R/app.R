@@ -61,16 +61,20 @@ ui <- shinydashboard::dashboardPage(
   )
 )
 
-
-# Server
+#server
 server <- function(input, output, session) {
 
-  filtered_data <- reactive({
-    pm25_data[pm25_data$City == input$selected_city, ]
+  # Load the cleaned PM2.5 data once
+  pm25_data <- load_pm25_data()
+
+  # Reactively filter based on selected city
+  filtered <- reactive({
+    filtered_data(input$selected_city, pm25_data)
   })
 
+  # Render the plot
   output$pm25_plot <- renderPlot({
-    data <- filtered_data()
+    data <- filtered()
     if (nrow(data) == 0) {
       plot.new()
       text(0.5, 0.5, "No data available for selected city", cex = 1.2)
@@ -89,7 +93,7 @@ server <- function(input, output, session) {
     }
   })
 
-
+  # Render the map
   output$pm25_map <- leaflet::renderLeaflet({
     leaflet::leaflet(pm25_data) %>%
       leaflet::addTiles() %>%
@@ -103,6 +107,7 @@ server <- function(input, output, session) {
       )
   })
 
+  # Allow clicking on map markers to update the city selector
   observeEvent(input$pm25_map_marker_click, {
     city_clicked <- input$pm25_map_marker_click$id
     if (!is.null(city_clicked)) {
@@ -110,7 +115,6 @@ server <- function(input, output, session) {
     }
   })
 }
-
 
 #' @export
 startApp <- function() {
